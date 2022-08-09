@@ -8,7 +8,7 @@ import SignUpScreen from "../screens/SingUpScreen/SignUpScreen";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../screens/HomeScreen';
-
+import ProfileImageScreen from '../screens/ProfileImageScreen/ProfileImageScreen';
 
 
 const Stack = createStackNavigator();
@@ -23,6 +23,7 @@ const Navigation = () => {
         <Stack.Screen name="ForgetPassword" component={ForgetPasswordScreen}/>
         <Stack.Screen name="NewPassword" component={NewPasswordScreen}/>
         <Stack.Screen name='Home' component={HomeScreen}/>
+        <Stack.Screen name='ProfileImage' component={ProfileImageScreen} />
       </Stack.Navigator>
      
 
