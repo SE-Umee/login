@@ -15,7 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useForm } from "react-hook-form";
 import ProfileImageScreen from "../ProfileImageScreen/ProfileImageScreen";
 
-const SignUpScreen = () => {
+const UpdateProfile = () => {
   const navigation = useNavigation();
 
   const Email_REGEX =
@@ -25,12 +25,19 @@ const SignUpScreen = () => {
 
   const pwd = watch("password");
 
-  const onRegisterPressed = () => {
-    navigation.navigate("ConfirmEmail");
-  };
-
   const onUpdatePressed = () => {
-    navigation.navigate("UpdateProfile");
+    Alert.alert(
+      "Update Profile",
+      "Do you want to update your Profile",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        { text: "OK", onPress: () => console.log("OK Pressed") }
+      ]
+    );
   };
 
   const onSignUpPressed = () => {
@@ -55,7 +62,7 @@ const SignUpScreen = () => {
           placeholder="username"
           control={control}
           rules={{
-            required: "UserName is required",
+            required: "Username is required",
             minLength: {
               value: 3,
               message: "User Name must be at least  3 Characters",
@@ -103,15 +110,8 @@ const SignUpScreen = () => {
         />
 
         <CustomButtom
-          text="Register"
-          onPress={handleSubmit(onRegisterPressed)}
-        />
-
-<CustomButtom
-          text="UpdateProfile"
-          onPress={onUpdatePressed}
-          bgColor="#E7EAF4"
-          fgColor="#4765A9"
+          text="Update"
+          onPress={handleSubmit(onUpdatePressed)}
         />
 
         <Text style={styles.text}>
@@ -158,4 +158,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignUpScreen;
+export default UpdateProfile;

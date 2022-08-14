@@ -9,6 +9,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileImageScreen from '../screens/ProfileImageScreen/ProfileImageScreen';
+import UpdateProfile from '../screens/UpdateProfile';
 
 
 const Stack = createStackNavigator();
@@ -24,6 +25,7 @@ const Navigation = () => {
         <Stack.Screen name="NewPassword" component={NewPasswordScreen}/>
         <Stack.Screen name='Home' component={HomeScreen}/>
         <Stack.Screen name='ProfileImage' component={ProfileImageScreen} />
+        <Stack.Screen name='UpdateProfile' component={UpdateProfile}/>
       </Stack.Navigator>
      
 
