@@ -47,14 +47,17 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
     width: "100%",
+    height:60,
     borderColor: "#e8e8e8",
     borderRadius: 5,
     borderWidth: 1,
     marginVertical: 15,
-    padding:15
+    padding:15,
+    
   },
   inputtext: {
     fontSize: 24,
+    height:60,
   },
 });
 

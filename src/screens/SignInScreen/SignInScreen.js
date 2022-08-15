@@ -57,7 +57,7 @@ const SignInScreen = () => {
           name="username"
           placeholder="UserName"
           control={control}
-          rules={{ required: "username is requirde" }}
+          rules={{ required: "username is required" }}
         />
         <CustomInput
           name="password"
@@ -65,10 +65,10 @@ const SignInScreen = () => {
           control={control}
           secureTextEntry
           rules={{
-            required: "Password is requirde",
+            required: "Password is required",
             minLength: {
               value: 6,
-              message: "Password should be minimun 6 character long ",
+              message: "Password should be minimum 6 character long ",
             },
           }}
         />
@@ -79,7 +79,6 @@ const SignInScreen = () => {
           onPress={onforgetPasswordPressed}
           type="TERTIARY"
         />
-        <SocialSignInButton />
         <CustomButtom
           text="Don't have an account? Create one"
           onPress={onSignUpPressed}
