@@ -7,16 +7,20 @@ import {
   ScrollView,
   TextInput,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomInput from "../../components/customInput";
 import CustomButtom from "../../components/customButton/CustomButtom";
 import SocialSignInButton from "../../components/SocialSignInButton";
 import { useNavigation } from "@react-navigation/native";
 import { useForm } from "react-hook-form";
+import { API } from "../../utils/helper";
 
 const SignInScreen = () => {
-  // const [username, setUsername] = useState("");
-  // const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState("");
 
   const { height } = useWindowDimensions();
   const navigation = useNavigation();
@@ -43,20 +47,58 @@ const SignInScreen = () => {
   const onSignUpPressed = () => {
     navigation.navigate("SignUp");
   };
+  const storeToken = async (value) => {
+    try {
+      const jsonValue = JSON.stringify(value);
+      await AsyncStorage.setItem("userData", jsonValue);
+    } catch (e) {
+      // saving error
+    }
+  };
+  const doSignIn = async () => {
+    try {
+      if (true) {
+        setLoading(true);
+        await axios
+          .post(`${API}/login`, {
+            email: email,
+            password: password,
+          })
+          .then(async (response) => {
+            if (response?.data?.data) {
+              await storeToken(response.data?.data);
+              navigation.navigate("Home");
+              setLoading(false);
+            } else {
+              setLoading(false);
+              console.log("No signIn");
+            }
+          })
+          .catch((error) => {
+            setLoading(false);
+            console.log("error", error);
+          });
+      }
+    } catch (error) {
+      console.log("error2", error);
+      setLoading(false);
+    }
+  };
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={styles.mainContaner}>
         <Image
-          source={require("../../asset/images/login.jpg")}
+          source={require("../../images/logo.jpg")}
           style={[styles.logo, { height: height * 0.3 }]}
           resizeMode="contain"
         />
 
         <CustomInput
-          name="username"
-          placeholder="UserName"
+          name="email"
+          placeholder="email"
           control={control}
+          onChangeText={(txt) => setEmail(txt)}
           rules={{ required: "username is required" }}
         />
         <CustomInput
@@ -64,6 +106,7 @@ const SignInScreen = () => {
           placeholder="Password"
           control={control}
           secureTextEntry
+          onChangeText={(txt) => setPassword(txt)}
           rules={{
             required: "Password is required",
             minLength: {
@@ -73,7 +116,7 @@ const SignInScreen = () => {
           }}
         />
 
-        <CustomButtom text="LogIn" onPress={handleSubmit(onSignInPressed)} />
+        <CustomButtom text="LogIn" onPress={() => doSignIn()} />
         <CustomButtom
           text="Forget Password"
           onPress={onforgetPasswordPressed}

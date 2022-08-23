@@ -4,30 +4,35 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
+  useWindowDimensions,
   Alert,
   Image,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomInput from "../../components/customInput";
 import CustomButtom from "../../components/customButton/CustomButtom";
 import SocialSignInButton from "../../components/SocialSignInButton";
 import { useNavigation } from "@react-navigation/native";
 import { useForm } from "react-hook-form";
 import ProfileImageScreen from "../ProfileImageScreen/ProfileImageScreen";
+import { API } from "../../utils/helper";
 
 const SignUpScreen = () => {
   const navigation = useNavigation();
-
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState("");
+  const { height } = useWindowDimensions();
   const Email_REGEX =
     /(?!.*\.{2})^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([\t]*\r\n)?[\t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([\t]*\r\n)?[\t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
 
   const { control, handleSubmit, watch } = useForm();
 
   const pwd = watch("password");
-
-  const onRegisterPressed = () => {
-    navigation.navigate("ConfirmEmail");
-  };
 
   const onUpdatePressed = () => {
     navigation.navigate("UpdateProfile");
@@ -42,18 +47,58 @@ const SignUpScreen = () => {
   const onPrivacyPressed = () => {
     console.warn("Privacy pressed");
   };
-
+  const doSignup = async () => {
+    try {
+      if (true) {
+        setLoading(true);
+        await axios
+          .post(`${API}/register`, {
+            email: email,
+            password: password,
+            name: name,
+          })
+          .then((response) => {
+            if (response.data) {
+              storeToken(response.data?.data);
+              setLoading(false);
+            } else {
+              setLoading(false);
+              console.log("No signup");
+            }
+          })
+          .catch((error) => {
+            setLoading(false);
+            console.log("error", error);
+          });
+      }
+    } catch (error) {
+      console.log("error2", error);
+      setLoading(false);
+    }
+  };
+  const storeToken = async (value) => {
+    try {
+      const jsonValue = JSON.stringify(value);
+      await AsyncStorage.setItem("userData", jsonValue);
+    } catch (e) {
+      // saving error
+    }
+  };
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={styles.mainContaner}>
+        {/* <ProfileImageScreen /> */}
+        <Image
+          source={require("../../images/logo.jpg")}
+          style={[styles.logo, { height: height * 0.3 }]}
+          resizeMode="contain"
+        />
         <Text style={styles.title}>Create an account</Text>
-
-        <ProfileImageScreen />
-
         <CustomInput
           name="username"
           placeholder="username"
           control={control}
+          onChangeText={(txt) => setName(txt)}
           rules={{
             required: "UserName is required",
             minLength: {
@@ -71,6 +116,7 @@ const SignUpScreen = () => {
           name="email"
           placeholder="Email"
           control={control}
+          onChangeText={(txt) => setEmail(txt)}
           rules={{
             required: "Email is required",
             pattern: { value: Email_REGEX, message: "Invalid Email" },
@@ -82,6 +128,7 @@ const SignUpScreen = () => {
           placeholder="Password"
           control={control}
           secureTextEntry
+          onChangeText={(txt) => setPassword(txt)}
           rules={{
             required: "Password is required",
             minLength: {
@@ -96,6 +143,7 @@ const SignUpScreen = () => {
           placeholder="Confirm Password"
           control={control}
           secureTextEntry
+          onChangeText={(txt) => setConfirmPassword(txt)}
           rules={{
             required: "Confirm Password is required",
             validate: (value) => value == pwd || "Password do not match",
@@ -104,10 +152,11 @@ const SignUpScreen = () => {
 
         <CustomButtom
           text="Register"
-          onPress={handleSubmit(onRegisterPressed)}
+          // onPress={handleSubmit(onRegisterPressed)}
+          onPress={() => doSignup()}
         />
 
-<CustomButtom
+        <CustomButtom
           text="UpdateProfile"
           onPress={onUpdatePressed}
           bgColor="#E7EAF4"
@@ -126,7 +175,6 @@ const SignUpScreen = () => {
             Privacy Policy
           </Text>{" "}
         </Text>
-
 
         <CustomButtom
           text=" Have an account? Sign In"
@@ -155,6 +203,12 @@ const styles = StyleSheet.create({
   },
   link: {
     color: "#FDB075",
+  },
+  logo: {
+    width: "70%",
+    height: 100,
+    maxWidth: 300,
+    maxHeight: 200,
   },
 });
 
