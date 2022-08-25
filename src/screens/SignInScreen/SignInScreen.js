@@ -1,48 +1,30 @@
 import {
   Image,
   StyleSheet,
-  Text,
   View,
   useWindowDimensions,
   ScrollView,
-  TextInput,
 } from "react-native";
 import React, { useState } from "react";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomInput from "../../components/customInput";
 import CustomButtom from "../../components/customButton/CustomButtom";
-import SocialSignInButton from "../../components/SocialSignInButton";
 import { useNavigation } from "@react-navigation/native";
-import { useForm } from "react-hook-form";
 import { API } from "../../utils/helper";
+import Loader from "../../components/Loader";
 
 const SignInScreen = () => {
   const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
+
   const [password, setPassword] = useState("");
+  const [passwordError, setPasswordErrorr] = useState("");
+
   const [loading, setLoading] = useState("");
 
   const { height } = useWindowDimensions();
   const navigation = useNavigation();
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-
-  console.log(errors);
-
-  const onSignInPressed = (data) => {
-    // Validate user
-    console.log(data);
-
-    navigation.navigate("Home");
-  };
-
-  const onforgetPasswordPressed = () => {
-    navigation.navigate("ForgetPassword");
-  };
 
   const onSignUpPressed = () => {
     navigation.navigate("SignUp");
@@ -51,9 +33,7 @@ const SignInScreen = () => {
     try {
       const jsonValue = JSON.stringify(value);
       await AsyncStorage.setItem("userData", jsonValue);
-    } catch (e) {
-      // saving error
-    }
+    } catch (e) {}
   };
   const doSignIn = async () => {
     try {
@@ -84,10 +64,20 @@ const SignInScreen = () => {
       setLoading(false);
     }
   };
-
+  const onSubmitEmail = () => {
+    if (email == "") {
+      setEmailError("Please fill email");
+    } else setEmailError("");
+  };
+  const onSubmitPassword = () => {
+    if (password == "") {
+      setPasswordErrorr("Please fill email");
+    } else setPasswordErrorr("");
+  };
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={styles.mainContaner}>
+        {loading ? <Loader start={loading} /> : null}
         <Image
           source={require("../../images/logo.jpg")}
           style={[styles.logo, { height: height * 0.3 }]}
@@ -97,30 +87,27 @@ const SignInScreen = () => {
         <CustomInput
           name="email"
           placeholder="email"
-          control={control}
+          onBlur={() => onSubmitEmail()}
+          error={emailError}
+          value={email}
           onChangeText={(txt) => setEmail(txt)}
-          rules={{ required: "username is required" }}
         />
         <CustomInput
           name="password"
           placeholder="Password"
-          control={control}
-          secureTextEntry
+          onBlur={() => onSubmitPassword()}
+          secureTextEntry={true}
           onChangeText={(txt) => setPassword(txt)}
-          rules={{
-            required: "Password is required",
-            minLength: {
-              value: 6,
-              message: "Password should be minimum 6 character long ",
-            },
-          }}
+          error={passwordError}
         />
 
-        <CustomButtom text="LogIn" onPress={() => doSignIn()} />
         <CustomButtom
-          text="Forget Password"
-          onPress={onforgetPasswordPressed}
-          type="TERTIARY"
+          text="LogIn"
+          onPress={() => doSignIn()}
+          disabled={email == "" || password == "" ? true : false}
+          bgColor={
+            email == "" || password == "" ? "gray" : "rgba(255, 147, 0, 255)"
+          }
         />
         <CustomButtom
           text="Don't have an account? Create one"

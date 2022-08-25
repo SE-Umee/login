@@ -1,50 +1,38 @@
 import { StyleSheet, Text, TextInput, View } from "react-native";
-import React from "react";
-import { Controller } from "react-hook-form";
+import React, { useState, useEffect } from "react";
 
 const CustomInPut = ({
-  control,
-  rules = {},
-  name,
   placeholder,
-  secureTextEntry,
+  secureTextEntry = false,
   onChangeText,
-  inputValue,
+  value,
+  onBlur,
+  error,
 }) => {
+  const [isError, setIsError] = useState(false);
+  useEffect(() => {
+    setIsError(error.length > 1 ? true : false);
+    console.log("acbdshjcbdshjcbhd", error);
+  }, [error]);
   return (
-    <Controller
-      control={control}
-      name={name}
-      rules={rules}
-      render={({
-        field: { value, onChange, onBlur },
-        fieldState: { error },
-      }) => (
-        <>
-          <View
-            style={[
-              styles.container,
-              { borderColor: error ? "red" : "#e8e8e8" },
-            ]}
-          >
-            <TextInput
-              styles={styles.inputtext}
-              placeholder={placeholder}
-              value={inputValue}
-              onChangeText={(txt) => onChangeText(txt)}
-              onBlur={onBlur}
-              secureTextEntry={secureTextEntry}
-              autoCapitalize="none"
-            />
-          </View>
-          {error && (
-            <Text style={{ color: "red", alignSelf: "stretch" }}>
-              {error.message || "Error"}
-            </Text>
-          )}
-        </>
+    <>
+      <View
+        style={[styles.container, { borderColor: isError ? "red" : "#e8e8e8" }]}
+      >
+        <TextInput
+          styles={styles.inputtext}
+          placeholder={placeholder}
+          value={value}
+          onChangeText={(txt) => onChangeText(txt)}
+          onBlur={onBlur}
+          secureTextEntry={secureTextEntry}
+          autoCapitalize="none"
+        />
+      </View>
+      {isError && (
+        <Text style={{ color: "red", alignSelf: "stretch" }}>{error}</Text>
       )}
-    />
+    </>
   );
 };
 

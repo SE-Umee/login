@@ -7,10 +7,12 @@ const CustomButtom = ({
   type = "PRIMARY",
   bgColor,
   fgColor,
+  disabled = false,
 }) => {
   return (
     <Pressable
       onPress={onPress}
+      disabled={disabled}
       style={[
         styles.contanier,
         styles[`contanier_${type}`],
@@ -41,22 +43,21 @@ const styles = StyleSheet.create({
   contanier_PRIMARY: {
     backgroundColor: "#3B71F3",
   },
-  contanier_SECONDARY:{
-    borderColor:"#3B71F3",
-    borderWidth:2
+  contanier_SECONDARY: {
+    borderColor: "#3B71F3",
+    borderWidth: 2,
   },
   contanier_TERTIARY: {},
   text: {
     fontWeight: "bold",
     color: "white",
   },
-  text_SECONDARY:{
-    color:"#3B71F3"
+  text_SECONDARY: {
+    color: "#3B71F3",
   },
   text_TERTIARY: {
     color: "gray",
   },
-
 });
 
 export default CustomButtom;

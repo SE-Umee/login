@@ -18,35 +18,26 @@ import { useNavigation } from "@react-navigation/native";
 import { useForm } from "react-hook-form";
 import ProfileImageScreen from "../ProfileImageScreen/ProfileImageScreen";
 import { API } from "../../utils/helper";
+import Loader from "../../components/Loader";
 
 const SignUpScreen = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [nameError, setNameError] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState("");
   const { height } = useWindowDimensions();
-  const Email_REGEX =
-    /(?!.*\.{2})^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([\t]*\r\n)?[\t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([\t]*\r\n)?[\t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
 
-  const { control, handleSubmit, watch } = useForm();
-
-  const pwd = watch("password");
-
-  const onUpdatePressed = () => {
-    navigation.navigate("UpdateProfile");
-  };
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordErrorr] = useState("");
+  const [confirmPasswordError, setConfirmPasswordErrorr] = useState("");
 
   const onSignUpPressed = () => {
     navigation.navigate("SignIn");
   };
-  const onTermofUsePressed = () => {
-    console.warn("onTermofUsePressed");
-  };
-  const onPrivacyPressed = () => {
-    console.warn("Privacy pressed");
-  };
+
   const doSignup = async () => {
     try {
       if (true) {
@@ -84,10 +75,30 @@ const SignUpScreen = () => {
       // saving error
     }
   };
+  const onSubmitName = () => {
+    if (name == "") {
+      setNameError("Please fill Name");
+    } else setNameError("");
+  };
+  const onSubmitEmail = () => {
+    if (email == "") {
+      setEmailError("Please fill email");
+    } else setEmailError("");
+  };
+  const onSubmitPassword = () => {
+    if (password == "") {
+      setPasswordErrorr("Please fill email");
+    } else setPasswordErrorr("");
+  };
+  const onSubmitConfirmPassword = () => {
+    if (password != confirmPassword || confirmPassword == "") {
+      setConfirmPasswordErrorr("Confirm password does not match");
+    } else setConfirmPasswordErrorr("");
+  };
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={styles.mainContaner}>
-        {/* <ProfileImageScreen /> */}
+        {loading ? <Loader start={loading} /> : null}
         <Image
           source={require("../../images/logo.jpg")}
           style={[styles.logo, { height: height * 0.3 }]}
@@ -97,83 +108,60 @@ const SignUpScreen = () => {
         <CustomInput
           name="username"
           placeholder="username"
-          control={control}
           onChangeText={(txt) => setName(txt)}
-          rules={{
-            required: "UserName is required",
-            minLength: {
-              value: 3,
-              message: "User Name must be at least  3 Characters",
-            },
-            maxLength: {
-              value: 24,
-              message: "User Name should be maximum 24 Characters",
-            },
-          }}
+          onBlur={() => onSubmitName()}
+          error={nameError}
+          value={name}
         />
 
         <CustomInput
           name="email"
           placeholder="Email"
-          control={control}
           onChangeText={(txt) => setEmail(txt)}
-          rules={{
-            required: "Email is required",
-            pattern: { value: Email_REGEX, message: "Invalid Email" },
-          }}
+          onBlur={() => onSubmitEmail()}
+          error={emailError}
+          value={email}
         />
 
         <CustomInput
           name="password"
           placeholder="Password"
-          control={control}
           secureTextEntry
           onChangeText={(txt) => setPassword(txt)}
-          rules={{
-            required: "Password is required",
-            minLength: {
-              value: 6,
-              message: "Password should be minimum 6 character long ",
-            },
-          }}
+          onBlur={() => onSubmitPassword()}
+          error={passwordError}
+          value={password}
         />
 
         <CustomInput
           name="confirmpassword"
           placeholder="Confirm Password"
-          control={control}
           secureTextEntry
           onChangeText={(txt) => setConfirmPassword(txt)}
-          rules={{
-            required: "Confirm Password is required",
-            validate: (value) => value == pwd || "Password do not match",
-          }}
+          onBlur={() => onSubmitConfirmPassword()}
+          error={confirmPasswordError}
+          value={confirmPassword}
         />
 
         <CustomButtom
           text="Register"
-          // onPress={handleSubmit(onRegisterPressed)}
           onPress={() => doSignup()}
-        />
-
-        <CustomButtom
-          text="UpdateProfile"
-          onPress={onUpdatePressed}
-          bgColor="#E7EAF4"
-          fgColor="#4765A9"
+          disabled={
+            email == "" || password == "" || confirmPassword == "" || name == ""
+              ? true
+              : false
+          }
+          bgColor={
+            email == "" || password == "" || confirmPassword == "" || name == ""
+              ? "gray"
+              : "rgba(255, 147, 0, 255)"
+          }
         />
 
         <Text style={styles.text}>
           By registring, You confirm that you can accept our{" "}
-          <Text style={styles.link} onPress={onTermofUsePressed}>
-            {" "}
-            Terms and Use
-          </Text>{" "}
-          and
-          <Text style={styles.link} onPress={onPrivacyPressed}>
-            {" "}
-            Privacy Policy
-          </Text>{" "}
+          <Text style={styles.link}> Terms and Use</Text> and
+          <Text style={styles.link}> Privacy Policy</Text>{" "}
         </Text>
 
         <CustomButtom
