@@ -22,22 +22,23 @@ const HomeScreen = (props) => {
 
   useEffect(() => {
     getData();
-    fetchAllUsers();
+    // fetchAllUsers();
   }, []);
   const getData = async () => {
     try {
       const value = await AsyncStorage.getItem("userData");
       if (value !== null) {
         setUserData(JSON.parse(value));
+        fetchAllUsers(JSON.parse(value));
         console.log("sssssasasasas", JSON.parse(value));
       }
     } catch (e) {
       // error reading value
     }
   };
-  const fetchAllUsers = async () => {
-    const header = await getHeaders(userData.token);
-    console.log("hhhh", userData);
+  const fetchAllUsers = async (value) => {
+    const header = await getHeaders(value.token);
+    console.log("hhhh", header);
     try {
       if (true) {
         setLoading(true);
@@ -45,7 +46,7 @@ const HomeScreen = (props) => {
           .get(`${API}/all_users`, header)
           .then((response) => {
             if (response.data) {
-              console.log("signup", JSON.stringify(response));
+              console.log("homeScreen", JSON.stringify(response));
               setAllUsers(response.data.data);
               setLoading(false);
             } else {
@@ -67,8 +68,8 @@ const HomeScreen = (props) => {
   const fetchSearchUsers = async (text) => {
     setSearch(text);
     const header = await getHeaders(userData.token);
-    try {
-      if (true) {
+    if (text.length > 1) {
+      try {
         setLoading(true);
         await axios
           .get(`${API}/search/${text}`, header)
@@ -86,10 +87,10 @@ const HomeScreen = (props) => {
             setLoading(false);
             console.log("error", error);
           });
+      } catch (error) {
+        console.log("error2", error);
+        setLoading(false);
       }
-    } catch (error) {
-      console.log("error2", error);
-      setLoading(false);
     }
   };
 
@@ -137,7 +138,7 @@ const HomeScreen = (props) => {
           onPress={() => props.navigation.navigate("UpdateProfile")}
         >
           <Image
-            source={require("../../images/logo.jpg")}
+            source={require("../../images/profile.png")}
             style={{ height: 50, width: 50, borderRadius: 25 }}
           />
         </TouchableOpacity>
@@ -148,7 +149,11 @@ const HomeScreen = (props) => {
 
           <View style={{ flex: 0.2 }}>
             <TouchableOpacity style={styles.searchBtn}>
-              <Text>TT</Text>
+              <Image
+                source={require("../../images/search.png")}
+                resizeMode="contain"
+                style={{ width: "60%", height: "60%", alignSelf: "center" }}
+              />
             </TouchableOpacity>
           </View>
         </View>

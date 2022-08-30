@@ -12,7 +12,6 @@ const CustomInPut = ({
   const [isError, setIsError] = useState(false);
   useEffect(() => {
     setIsError(error.length > 1 ? true : false);
-    console.log("acbdshjcbdshjcbhd", error);
   }, [error]);
   return (
     <>

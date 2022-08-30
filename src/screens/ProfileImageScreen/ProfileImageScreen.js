@@ -1,12 +1,15 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
-import React from "react";
-import * as ImagePicker from "expo-image-picker";
 import { useState, useEffect } from "react";
+import * as ImagePicker from "expo-image-picker";
 import { AntDesign } from "@expo/vector-icons";
 
 const ProfileImageScreen = (props) => {
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState("");
 
+  useEffect(() => {
+    setImage(props?.image ? props?.image : null);
+    console.log("image...", props?.image);
+  }, []);
   const addImage = async () => {
     let _image = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,

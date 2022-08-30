@@ -37,28 +37,28 @@ const SignInScreen = () => {
   };
   const doSignIn = async () => {
     try {
-      if (true) {
-        setLoading(true);
-        await axios
-          .post(`${API}/login`, {
-            email: email,
-            password: password,
-          })
-          .then(async (response) => {
-            if (response?.data?.data) {
-              await storeToken(response.data?.data);
-              navigation.navigate("Home");
-              setLoading(false);
-            } else {
-              setLoading(false);
-              console.log("No signIn");
-            }
-          })
-          .catch((error) => {
+      setLoading(true);
+      await axios
+        .post(`${API}/login`, {
+          email: email,
+          password: password,
+        })
+        .then(async (response) => {
+          if (response.data.status == false) {
+            alert(response.data.message);
+
             setLoading(false);
-            console.log("error", error);
-          });
-      }
+          } else {
+            setLoading(false);
+            await storeToken(response.data?.data);
+            console.log("login...", JSON.stringify(response.data?.data));
+            navigation.navigate("Home");
+          }
+        })
+        .catch((error) => {
+          setLoading(false);
+          console.log("error", error);
+        });
     } catch (error) {
       console.log("error2", error);
       setLoading(false);

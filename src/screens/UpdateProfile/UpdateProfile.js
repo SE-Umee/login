@@ -5,10 +5,13 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  KeyboardAvoidingView,
   Image,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import * as ImagePicker from "expo-image-picker";
+import { AntDesign } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomInput from "../../components/customInput";
 import CustomButtom from "../../components/customButton/CustomButtom";
@@ -20,9 +23,9 @@ import ProfileImageScreen from "../ProfileImageScreen/ProfileImageScreen";
 import { API, getHeaders, PHOTO_BASE_URL } from "../../utils/helper";
 import Loader from "../../components/Loader";
 
-const UpdateProfile = () => {
+const UpdateProfile = (props) => {
   const navigation = useNavigation();
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -63,12 +66,18 @@ const UpdateProfile = () => {
       if (value !== null) {
         setUserData(JSON.parse(value));
         let _value = JSON.parse(value);
-        console.log("bjhsabcdhjsbchjsdbvcdhjsbvchdsbhjds", value);
         setName(_value?.user?.name || "");
         setEmail(_value.user.email || "");
         setAge(_value.user.age || "");
         setAddress(_value.user.address || "");
         setHeight(_value.user.height || "");
+        setImage(`${API}/${_value.user.profile}`);
+        console.log(
+          ".....",
+          value,
+          "uuuuuRRRR",
+          `${API}/${_value.user.profile}`
+        );
       }
     } catch (e) {
       // error reading value
@@ -105,10 +114,27 @@ const UpdateProfile = () => {
       if (true) {
         setLoading(true);
         await axios
-          .get(`${API}/update`, _data, header)
-          .then((response) => {
-            if (response) {
-              console.log("uuuuuuuuppp", JSON.stringify(response));
+          .post(`${API}/update`, _data, header)
+          .then(async (response) => {
+            if (response.data.status != false) {
+              let _data = {
+                user: {
+                  name: response?.data.data?.user[0].name,
+                  email: response?.data.data?.user[0].email,
+                  age: response?.data.data?.user[0].age,
+                  height: response?.data.data?.user[0].height,
+                  address: response?.data.data?.user[0].address,
+                  profile: response?.data.data?.user[0].profile,
+                },
+              };
+              alert(response.data.message);
+              setName(response?.data.data?.user[0].name || "");
+              setEmail(response?.data.data?.user[0].email || "");
+              setAge(response?.data.data?.user[0].age || "");
+              setAddress(response?.data.data?.user[0].address || "");
+              setHeight(response?.data.data?.user[0].height || "");
+              setImage(`${API}/${response?.data.data?.user[0].profile}`);
+              props.navigation.navigate("Home");
               setLoading(false);
             } else {
               setLoading(false);
@@ -125,12 +151,52 @@ const UpdateProfile = () => {
       setLoading(false);
     }
   };
+  const storeToken = async (value) => {
+    try {
+      const jsonValue = JSON.stringify(value);
+      await AsyncStorage.setItem("userData", jsonValue);
+    } catch (e) {}
+  };
+  const addImage = async () => {
+    let _image = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      base64: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    console.log(JSON.stringify(_image));
+
+    if (!_image.cancelled) {
+      setImage(_image.uri);
+      let imgs = "data:image/png;base64," + _image.base64;
+      setImage(imgs);
+    }
+  };
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: 300 }}
+    >
       <View style={styles.mainContaner}>
         {loading ? <Loader start={loading} /> : null}
         <Text style={styles.title}>Update your profile</Text>
-        <ProfileImageScreen setImage={(link) => myImage(link)} />
+
+        <View style={styles.container}>
+          {image && (
+            <Image
+              source={{ uri: image }}
+              style={{ width: 200, height: 200 }}
+            />
+          )}
+
+          <View style={styles.uploadBtnContainer}>
+            <TouchableOpacity onPress={addImage} style={styles.uploadBtn}>
+              <Text>{image ? "Edit" : "Upload"} Image</Text>
+              <AntDesign name="camera" size={20} color="black" />
+            </TouchableOpacity>
+          </View>
+        </View>
         <CustomInput
           name="name"
           placeholder="Name"
@@ -182,9 +248,23 @@ const UpdateProfile = () => {
         <CustomButtom
           text="Update"
           onPress={onUpdatePressed}
-          disabled={email == "" || name == "" ? true : false}
+          disabled={
+            email == "" ||
+            name == "" ||
+            age == "" ||
+            height == "" ||
+            address == ""
+              ? true
+              : false
+          }
           bgColor={
-            email == "" || name == "" ? "gray" : "rgba(255, 147, 0, 255)"
+            email == "" ||
+            name == "" ||
+            age == "" ||
+            height == "" ||
+            address == ""
+              ? "gray"
+              : "rgba(255, 147, 0, 255)"
           }
         />
       </View>
@@ -209,6 +289,29 @@ const styles = StyleSheet.create({
   },
   link: {
     color: "#FDB075",
+  },
+  container: {
+    elevation: 2,
+    height: 200,
+    width: 200,
+    backgroundColor: "#efefef",
+    position: "relative",
+    borderRadius: 999,
+    overflow: "hidden",
+  },
+  uploadBtnContainer: {
+    opacity: 0.7,
+    position: "absolute",
+    right: 0,
+    bottom: 0,
+    backgroundColor: "lightgrey",
+    width: "100%",
+    height: "25%",
+  },
+  uploadBtn: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

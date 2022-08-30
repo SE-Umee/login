@@ -3,20 +3,16 @@ import {
   Text,
   View,
   ScrollView,
-  TouchableOpacity,
   useWindowDimensions,
-  Alert,
   Image,
 } from "react-native";
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomInput from "../../components/customInput";
 import CustomButtom from "../../components/customButton/CustomButtom";
-import SocialSignInButton from "../../components/SocialSignInButton";
-import { useNavigation } from "@react-navigation/native";
-import { useForm } from "react-hook-form";
-import ProfileImageScreen from "../ProfileImageScreen/ProfileImageScreen";
+
 import { API } from "../../utils/helper";
 import Loader from "../../components/Loader";
 
@@ -40,28 +36,29 @@ const SignUpScreen = () => {
 
   const doSignup = async () => {
     try {
-      if (true) {
-        setLoading(true);
-        await axios
-          .post(`${API}/register`, {
-            email: email,
-            password: password,
-            name: name,
-          })
-          .then((response) => {
-            if (response.data) {
-              storeToken(response.data?.data);
-              setLoading(false);
-            } else {
-              setLoading(false);
-              console.log("No signup");
-            }
-          })
-          .catch((error) => {
+      setLoading(true);
+      await axios
+        .post(`${API}/register`, {
+          email: email,
+          password: password,
+          name: name,
+        })
+        .then((response) => {
+          if (response.data) {
+            alert(response.data.message);
+            navigation.navigate("SignIn");
+            storeToken(response.data?.data);
             setLoading(false);
-            console.log("error", error);
-          });
-      }
+          } else {
+            setLoading(false);
+            console.log("No signup");
+          }
+        })
+        .catch((error) => {
+          setLoading(false);
+          alert(error);
+          console.log("error.", error);
+        });
     } catch (error) {
       console.log("error2", error);
       setLoading(false);
