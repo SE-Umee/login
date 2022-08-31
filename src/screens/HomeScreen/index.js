@@ -132,7 +132,22 @@ const HomeScreen = (props) => {
   };
   return (
     <View style={styles.container}>
-      <View style={styles.searchBox}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          paddingHorizontal: 10,
+        }}
+      >
+        <TouchableOpacity
+          style={styles.logOut}
+          onPress={() => props.navigation.navigate("SignIn")}
+        >
+          <Image
+            source={require("../../images/shutdown.png")}
+            style={{ height: 50, width: 50, borderRadius: 25 }}
+          />
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.profile}
           onPress={() => props.navigation.navigate("UpdateProfile")}
@@ -142,6 +157,8 @@ const HomeScreen = (props) => {
             style={{ height: 50, width: 50, borderRadius: 25 }}
           />
         </TouchableOpacity>
+      </View>
+      <View style={styles.searchBox}>
         <View style={styles.searchRow}>
           <View style={{ flex: 0.8 }}>
             <SearchBar />
@@ -244,6 +261,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "flex-end",
     marginBottom: 15,
+  },
+  logOut: {
+    alignSelf: "flex-start",
   },
   searchRow: {
     flexDirection: "row",
